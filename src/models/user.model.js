@@ -15,7 +15,7 @@ const schema = new mongoose.Schema({
         unique: true,
     },
     phoneNumber: {
-        type: Number,
+        type: String,
         required: true,
         minLength:[10,'Phone number must be at least 10 characters'],
         min:[10,'Phone number must be at least 10 characters'],
