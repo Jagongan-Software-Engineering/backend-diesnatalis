@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const port = 3000 || process.env.PORT
+const port = process.env.PORT || 3000
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const UserRoute = require('./src/routes/user.route')
