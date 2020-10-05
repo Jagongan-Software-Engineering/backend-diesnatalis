@@ -17,6 +17,10 @@ app.use(cors())
 
 app.use(UserRoute)
 
+app.use('/',(req,res) =>{
+    res.send('welcome to diesnatalis API')
+})
+
 app.listen(port, ()=>{
     console.log(`Server listening on port ${port}`);
 })
