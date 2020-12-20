@@ -7,7 +7,7 @@ exports.verifyEmail = (data) => {
         auth:{
             user:process.env.EMAIL,
             pass:process.env.PASSWORD
-        }
+        },
     })
     const mailOptions = {
         from:'DiesNatalis <febryardiansyah27@gmail.com>',
@@ -15,10 +15,11 @@ exports.verifyEmail = (data) => {
         subject: 'Email Verification',
         html: `${verifyEmailTemplate(data)}`
     }
-    transporter.sendMail(mailOptions,(err,info) =>{
+    transporter.sendMail(mailOptions,(err,response) =>{
         if(err) {
             console.log(err);
+        }else{
+            console.log('email sent to : '+response);
         }
-        console.log('email sent to : '+info);
     })
 }

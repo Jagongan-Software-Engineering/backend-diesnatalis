@@ -36,7 +36,7 @@ exports.registerUser = async (req,res)=>{
         if(isUserExists){
             return res.status(400).send({
                 status:false,
-                message: 'User already exists'
+                message: 'Email already used'
             })
         }
         const hashedPassword = await bcrypt.hash(password,12)
@@ -47,9 +47,10 @@ exports.registerUser = async (req,res)=>{
         })
         const savedUser = await user.save()
         await verifyEmail(savedUser)
+        
         res.send({
             status:true,
-            message:'success',
+            message:'Success, check your email  ',
             user
         })
     } catch (error) {
@@ -74,13 +75,28 @@ exports.registerUser = async (req,res)=>{
 exports.signIn = async(req, res) => {
     const {email,password} = req.body;
 
+    const isEmailValid = RegexValidation.hasMatch(email,RegexPattern.email);
+    if(!isEmailValid){
+        return res.status(400).send({
+            status:false,
+            message: 'Email is not valid'
+        })
+    }
+
+    if(!email || !password){
+        return res.status(400).send({
+            status:false,
+            message: 'Field must not be empty'
+        })
+    }
+
     try {
         const user = await UserModel.findOne({email:email});
         if(!user)return res.status(400).send({status:false,message:'User not exists' });
 
-        const hachedPassword = await bcrypt.compare(password,user.password)
+        const hashedPassword = await bcrypt.compare(password,user.password)
         
-        if(!hachedPassword){
+        if(!hashedPassword){
             return res.status(422).send({status:false,message:'Email or Password incorrect'})
         }
         if(!user.isEmailVerified){
