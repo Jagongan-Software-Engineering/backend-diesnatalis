@@ -3,32 +3,28 @@ const UserModel = require('../models/user.model.js')
 const { RegexValidation, RegexPattern } = require("regexpattern-collection").default;
 const bcrypt = require('bcryptjs');
 const { verifyEmail } = require('../helpers/email.js');
+const LombaModel = require('../models/lomba.model')
 
 
 exports.registerUser = async (req,res)=>{
-    const {name,email,address,phoneNumber,status,password} = req.body;
+    const {name,email,password} = req.body;
 
-    if(!name || !email || !address || !phoneNumber || !status || !password){
+    if(!name || !email || !password){
         return res.status(400).send({
             status:false,
             message: 'Field must not be empty'
         })
     }
     const isEmailValid = RegexValidation.hasMatch(email,RegexPattern.email);
-    const isPhoneNumberValid = RegexValidation.hasMatch(phoneNumber,RegexPattern.phoneNumber)
+    const isPasswordValid = RegexValidation.hasMatch(password,RegexPattern.passwordModerate);
 
     if(!isEmailValid){
         return res.status(400).send({
             status:false,
             message: 'Email is not valid'
         })
-    }else if(!isPhoneNumberValid){
-        return res.status(400).send({
-            status:false,
-            message: 'Phone number is not valid'
-        })
-    }else if(password.length < 8){
-        return res.status(400).send({status:false, message: 'Password length must be at least 8 characters'})
+    }if(!isPasswordValid){
+        return res.status(400).send({status:false, message: 'Should have 1 lowercase letter, 1 uppercase letter, 1 number and be at least 8 characters long'})
     }
 
     try {
@@ -42,8 +38,8 @@ exports.registerUser = async (req,res)=>{
         const hashedPassword = await bcrypt.hash(password,12)
 
         const user = new UserModel({
-            email,address,status,phoneNumber,name,isEmailVerified:false
-            ,password: hashedPassword
+            email,address:'',status:'',phoneNumber:'',name,isEmailVerified:false
+            ,password: hashedPassword,member2:'',member3:'',
         })
         const savedUser = await user.save()
         await verifyEmail(savedUser)
@@ -54,18 +50,8 @@ exports.registerUser = async (req,res)=>{
             user
         })
     } catch (error) {
-        if(error.errors['password']){
-            return res.status(400).send({
-                status:false,
-                message:error.errors['password'].message
-            })
-        }else if(error.errors['phoneNumber']){
-            return res.status(400).send({
-                status:false,
-                message:error.errors['phoneNumber'].message
-            })
-        }
-        res.status(400).send({
+        console.log(error);
+        return res.status(400).send({
             status:false,
             message:error
         })
@@ -126,4 +112,30 @@ exports.verifyEmail = async (req, res) => {
     } catch (error) {
         res.send(error)
     }
+}
+
+exports.registerLomba = async (req, res) => {
+    const {name,address,email,phone,status,school} = req.body
+    if(!name || !address || !email || !phone || !status || !school){
+        return res.status(400).send({
+            status:false,message:'field mus not be empty'
+        })
+    }
+    
+    const isEmailValid = RegexValidation.hasMatch(email,RegexPattern.email)
+    const isPhoneValid = RegexValidation.hasMatch(phone,RegexPattern.phoneNumber)
+
+    if(!isEmailValid){
+        return res.status(400).send({status:false,message:'email is not valid'})
+    }else if(isPhoneValid){
+        return res.status(400).send({status:false,message:'phone number is not valid'})
+    }
+}
+
+exports.getUserInfo = async (req, res) => {
+    return res.status(200).send({
+        status:true,
+        message: 'get user success',
+        user:req.user
+    })
 }

@@ -7,7 +7,6 @@ const schema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: true,
     },
     email: {
         type: String,
@@ -16,20 +15,28 @@ const schema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        required: true,
         minLength:[10,'Phone number must be at least 10 characters'],
         min:[10,'Phone number must be at least 10 characters'],
     },
     status: {
         type: String,
-        required: true,
     },
     isEmailVerified: Boolean,
     password: {
         type:String,
         required: true,
         minlength: [8,'Password length must be at least 8 characters'],
-    }
+    },
+    school:{
+        type:String,
+    },
+    member2:{
+        type:String,
+    },
+    member3:{
+        type:String,
+    },
+
     
 },{timestamps:true})
 
