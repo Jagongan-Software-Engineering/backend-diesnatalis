@@ -8,8 +8,7 @@ router.post('/register',UserController.registerUser)
 router.post('/signin',UserController.signIn)
 router.get('/verifyemail/:id',UserController.verifyEmail)
 router.get('/info',requireLogin,UserController.getUserInfo)
-router.post('/registerlomba',requireLogin,UserController.registerLomba)
-
+router.put('/registerlomba',requireLogin,UserController.registerLomba)
 UserRoute.use('/user',router)
 
 module.exports = UserRoute

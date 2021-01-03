@@ -3,7 +3,6 @@ const UserModel = require('../models/user.model.js')
 const { RegexValidation, RegexPattern } = require("regexpattern-collection").default;
 const bcrypt = require('bcryptjs');
 const { verifyEmail } = require('../helpers/email.js');
-const LombaModel = require('../models/lomba.model')
 
 
 exports.registerUser = async (req,res)=>{
@@ -114,28 +113,31 @@ exports.verifyEmail = async (req, res) => {
     }
 }
 
-exports.registerLomba = async (req, res) => {
-    const {name,address,email,phone,status,school} = req.body
-    if(!name || !address || !email || !phone || !status || !school){
-        return res.status(400).send({
-            status:false,message:'field mus not be empty'
-        })
-    }
-    
-    const isEmailValid = RegexValidation.hasMatch(email,RegexPattern.email)
-    const isPhoneValid = RegexValidation.hasMatch(phone,RegexPattern.phoneNumber)
-
-    if(!isEmailValid){
-        return res.status(400).send({status:false,message:'email is not valid'})
-    }else if(isPhoneValid){
-        return res.status(400).send({status:false,message:'phone number is not valid'})
-    }
-}
-
 exports.getUserInfo = async (req, res) => {
     return res.status(200).send({
         status:true,
         message: 'get user success',
         user:req.user
     })
+}
+
+exports.registerLomba = async (req,res) => {
+    const {name,address,phoneNumber,status,school} = req.body;
+    if(!name || !address || !phoneNumber || !status || !school){
+        return res.status(400).send({status:false,message:'field must not be empty'})
+    }
+    const isPhoneNumberValid = RegexValidation.hasMatch(phoneNumber,RegexPattern.phoneNumber)
+    if(!isPhoneNumberValid){
+        return res.status(400).send({status:false,message:'phone number is not valid'})
+    }
+    try {
+        await UserModel.findByIdAndUpdate({_id:req.user._id},{
+            name,address,phoneNumber,status,school
+        })
+        return res.status(200).send({
+            status:true,message:'register success',
+        })
+    } catch (error) {
+        return res.status(400).send({status:false,message:error})
+    }
 }
