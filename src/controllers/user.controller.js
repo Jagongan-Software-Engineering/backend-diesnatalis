@@ -3,7 +3,7 @@ const UserModel = require('../models/user.model.js')
 const { RegexValidation, RegexPattern } = require("regexpattern-collection").default;
 const bcrypt = require('bcryptjs');
 const { verifyEmail } = require('../helpers/email.js');
-
+const WebinarModel = require('../models/webinar.model.js')
 
 exports.registerUser = async (req,res)=>{
     const {name,email,password} = req.body;
@@ -137,6 +137,39 @@ exports.registerLomba = async (req,res) => {
         return res.status(200).send({
             status:true,message:'register success',
         })
+    } catch (error) {
+        return res.status(400).send({status:false,message:error})
+    }
+}
+
+exports.registerWebinar = async (req, res) => {
+    const {name,phoneNumber,school} = req.body;
+    if(!name || !phoneNumber || !school){
+        return res.status(400).send({status:false,message:'field must not be empty'})
+    }
+    const isPhoneNumberValid = RegexValidation.hasMatch(phoneNumber,RegexPattern.phoneNumber)
+
+    if(!isPhoneNumberValid){
+        return res.status(400).send({status:false,message:'phone number not valid'})
+    }
+    const isExist = await WebinarModel.findOne({'registeredBy.email':req.user.email})
+    if(isExist){
+        return res.status(400).send({status:false,message:'Email already registered'})
+    }
+    try {
+        const user = {
+            ...req.user,
+            password:undefined,
+            member2:undefined,
+            member3:undefined,
+            __v:undefined,
+        }
+        const webinar = new WebinarModel({
+            name,phoneNumber,school,isPayed:false,
+            registeredBy:user
+        });
+        await webinar.save();
+        res.send(webinar)
     } catch (error) {
         return res.status(400).send({status:false,message:error})
     }

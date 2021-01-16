@@ -9,6 +9,7 @@ router.post('/signin',UserController.signIn)
 router.get('/verifyemail/:id',UserController.verifyEmail)
 router.get('/info',requireLogin,UserController.getUserInfo)
 router.put('/registerlomba',requireLogin,UserController.registerLomba)
+router.post('/webinar',requireLogin,UserController.registerWebinar)
 UserRoute.use('/user',router)
 
 module.exports = UserRoute
