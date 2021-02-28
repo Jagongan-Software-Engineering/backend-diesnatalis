@@ -5,20 +5,28 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    address: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique:true,
+    },
     phoneNumber:{
         type: String,
         minLength:[10,'Phone number must be at least 10 characters'],
         min:[10,'Phone number must be at least 10 characters'],
     },
-    isPayed:Boolean,
+    status: {
+        type: String,
+        required: true,
+    },
     school: {
         type: String,
         required: true,
     },
-    registeredBy: {
-        type: mongoose.Schema.Types,
-        ref:"User"
-    }
 },{timestamps:true})
 
 const WebinarModel = mongoose.model("Webinar",schema)

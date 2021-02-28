@@ -143,33 +143,41 @@ exports.registerLomba = async (req,res) => {
 }
 
 exports.registerWebinar = async (req, res) => {
-    const {name,phoneNumber,school} = req.body;
-    if(!name || !phoneNumber || !school){
+    const {name,address,email,phoneNumber,status,school} = req.body;
+    if(!name || !phoneNumber || !school || !address || !email || !status){
         return res.status(400).send({status:false,message:'field must not be empty'})
     }
     const isPhoneNumberValid = RegexValidation.hasMatch(phoneNumber,RegexPattern.phoneNumber)
+    const isEmailValid = RegexValidation.hasMatch(email,RegexPattern.email)
+
+    if(!isEmailValid){
+        return res.status(400).send({status:false,message:'email not valid'})
+    }
 
     if(!isPhoneNumberValid){
         return res.status(400).send({status:false,message:'phone number not valid'})
     }
-    const isExist = await WebinarModel.findOne({'registeredBy.email':req.user.email})
+    const isExist = await WebinarModel.findOne({'email':email})
     if(isExist){
         return res.status(400).send({status:false,message:'Email already registered'})
     }
     try {
-        const user = {
-            ...req.user,
-            password:undefined,
-            member2:undefined,
-            member3:undefined,
-            __v:undefined,
-        }
         const webinar = new WebinarModel({
-            name,phoneNumber,school,isPayed:false,
-            registeredBy:user
+            name,address,email,phoneNumber,status,school
         });
-        await webinar.save();
+        const savedWebinar = await webinar.save();
+        await verifyEmail(savedWebinar)
         res.send(webinar)
+    } catch (error) {
+        return res.status(400).send({status:false,message:error})
+    }
+}
+
+exports.getAllUserWebinar = async(req, res) =>{
+    try {
+        const webinar = await WebinarModel.find();
+
+        return res.status(200).send({webinar})
     } catch (error) {
         return res.status(400).send({status:false,message:error})
     }

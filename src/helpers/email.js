@@ -10,7 +10,7 @@ exports.verifyEmail = (data) => {
         },
     })
     const mailOptions = {
-        from:'DiesNatalis <febryardiansyah27@gmail.com>',
+        from:'DiesNatalis <febrymuhammad80@gmail.com>',
         to: `${data.name} <${data.email}>`,
         subject: 'Email Verification',
         html: `${verifyEmailTemplate(data)}`
